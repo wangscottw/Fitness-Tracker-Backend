@@ -2,6 +2,7 @@
 // const { } = require('./');
 const client = require("./client")
 const {createUser} = require('./users')
+const {createActivity} = require('./activities')
 
 async function dropTables() {
   try {

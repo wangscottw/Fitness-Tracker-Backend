@@ -23,19 +23,16 @@ async function createUser({ username, password }) {
   }
 
 async function getUser({ username, password }) {
+  try {
   const user = await getUserByUsername(username);
   const hashedPassword = user.password;
   const isValid = await bcrypt.compare(password, hashedPassword)
   if (isValid) {
-    const {rows: [user]} = await client.query(`
-    SELECT (username, password)
-    FROM users
-    WHERE (username = ${username} AND password = ${password})
-    `, [username, hashedPassword])
     delete user.password //might have to move this
     return user;
-  } else{
-    
+  }
+  } catch (error) {
+    console.error(error)
   }
 
 }
