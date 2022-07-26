@@ -91,7 +91,8 @@ async function attachActivitiesToRoutines(routines) {
   }
 }
 
-async function updateActivity({ activityId, ...fields }) {
+async function updateActivity({ id, ...fields }) {
+  
   // don't try to update the id
   // do update the name and description
   // return the updated activity
@@ -103,15 +104,17 @@ async function updateActivity({ activityId, ...fields }) {
     return;
   }
   try {
+    console.log(id, "testing for activityId")
     const {
       rows: [activity]
     } = await client.query(`
-    UPDATE activties
+    UPDATE activities
     SET ${setString}
-    WHERE id=${activityId}
-    RETURNING *
+    WHERE id=${id}
+    RETURNING *;
     `,
    Object.values(fields));
+   console.log(activity, "testing for activity")
    return activity;
   } catch (error) {
     console.error
