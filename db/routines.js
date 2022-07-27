@@ -77,10 +77,31 @@ async function getAllRoutinesByUser({ username }) {
 }
 
 async function getPublicRoutinesByUser({ username }) {
-
+  try {
+    const {rows: routines} = await client.query(`
+    SELECT routines.*, users.username AS "creatorName"
+    FROM routines
+    JOIN users ON routines."creatorId" = users.id
+    WHERE "isPublic" = true AND username = $1;
+  `, [username]) 
+  return attachActivitiesToRoutines(routines);} 
+  catch (error) {
+    console.error('Trouble getting all public routines', error)
+    }
+  }
+async function getPublicRoutinesByActivity({ id }) {
+  try {
+    const {rows: routines} = await client.query(`
+    SELECT routines.*, activities.name
+    FROM routines
+    JOIN activities ON routines."creatorId" = activities.id
+    WHERE "isPublic" = true;
+  `) 
+  return attachActivitiesToRoutines(routines);} 
+  catch (error) {
+    console.error('Trouble getting all public routines', error)
+    }
 }
-
-async function getPublicRoutinesByActivity({ id }) {}
 
 async function updateRoutine({ id, ...fields }) {
   const setString = Object.keys(fields).map((key, index) => `"${key}"=$${index + 1}`
@@ -105,20 +126,26 @@ async function updateRoutine({ id, ...fields }) {
 }
 }
 
-//Unfinished
 async function destroyRoutine(id) {
   try {
+    await client.query(`
+    DELETE FROM routine_activities
+    WHERE "routineId" = ${id};
+    `)
+    
     const {rows: [routine]} = await client.query(`
-    DELETE routines
+    DELETE FROM routines
     WHERE id=${id}
     RETURNING *;
     `)
+
     return routine;
   } 
    catch (error) {
   console.error ('trouble removing routine', error);
 
    }
+
   }
 
 module.exports = {
