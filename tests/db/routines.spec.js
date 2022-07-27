@@ -117,7 +117,7 @@ describe("DB Routines", () => {
      and write the addActivityToRoutine function.****/
 
   describe("createRoutine", () => {
-    xit("Creates and returns the new routine", async () => {
+    it("Creates and returns the new routine", async () => {
       const user = await createFakeUser();
       const routine = await createRoutine({
         creatorId: user.id,
@@ -137,7 +137,7 @@ describe("DB Routines", () => {
     });
   });
 
-  describe("getAllRoutines", () => {
+  xdescribe("getAllRoutines", () => {
     xit("should include the public routine", async () => {
       const routines = await getAllRoutines();
       expectRoutinesToContainRoutine(routines, fakeRoutine);
@@ -148,7 +148,7 @@ describe("DB Routines", () => {
       expectRoutinesToContainRoutine(routines, fakePrivateRoutine);
     });
 
-    xit("includes their activities", async () => {
+    it("includes their activities", async () => {
       const routines = await getAllRoutines();
       const routine = routines.find((routine) => routine.id === fakeRoutine.id);
       expectRoutineToContainActivity(routine, fakeActivity);
@@ -176,7 +176,7 @@ describe("DB Routines", () => {
       expect(activity.count).toEqual(fakeRoutineActivity.count);
     });
 
-    xit("includes the routineId and routineActivityId on activities", async () => {
+    it("includes the routineId and routineActivityId on activities", async () => {
       const routines = await getAllRoutines();
       const routine = routines.find((routine) => routine.id === fakeRoutine.id);
       const activity = routine.activities.find(

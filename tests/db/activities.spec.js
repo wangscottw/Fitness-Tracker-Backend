@@ -65,7 +65,6 @@ describe("DB Activities", () => {
         "Baseball",
         "Run the bases"
       );
-      console.log(fakeActivity, "!!!!!!!!!!!!!")
       const name = "Softball";
       const updatedActivity = await updateActivity({
         id: fakeActivity.id,

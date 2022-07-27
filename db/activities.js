@@ -104,7 +104,6 @@ async function updateActivity({ id, ...fields }) {
     return;
   }
   try {
-    console.log(id, "testing for activityId")
     const {
       rows: [activity]
     } = await client.query(`
@@ -114,7 +113,6 @@ async function updateActivity({ id, ...fields }) {
     RETURNING *;
     `,
    Object.values(fields));
-   console.log(activity, "testing for activity")
    return activity;
   } catch (error) {
     console.error
