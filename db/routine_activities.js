@@ -8,12 +8,13 @@ async function addActivityToRoutine({
   duration,
 }) {
 try {
-  const {rows: [activity]} = await client.query(`
-  INSERT INTO routine_activities ("routineId", "activityId", count,duration)
-  VALUES ($1, $2,$3,$4)
-  RETURNING *
-  `, [routineId,activityId,count,duration])
-  return activity
+   const {rows: [routine]} = await client.query(`
+   INSERT INTO routine_activities ("routineId", "activityId", count, duration)
+   VALUES ($1, $2, $3, $4)
+   ON CONFLICT ("routineId", "activityId") DO NOTHING
+   RETURNING *;
+   `, [routineId, activityId, count, duration])
+   return routine
 } catch (error) {
   console.error('Trouble adding activity to routines', error)
 }
