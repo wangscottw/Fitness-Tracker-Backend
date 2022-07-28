@@ -1,9 +1,14 @@
 require("dotenv").config()
 const express = require("express")
 const app = express()
+require("dotenv").config()
+var cors = require('cors')
 
 // Setup your Middleware and API Router here
 const morgan = require('morgan')
+
+app.use(cors())
+
 app.use(morgan('dev'))
 
 app.use(express.json())

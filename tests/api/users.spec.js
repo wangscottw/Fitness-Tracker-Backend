@@ -36,7 +36,7 @@ const {
 } = require("../../errors");
 
 describe("/api/users", () => {
-  describe("POST /api/users/register", () => {
+  xdescribe("POST /api/users/register", () => {
     it("Creates a new user.", async () => {
       // Create some fake user data
       const fakeUserData = {
@@ -201,7 +201,7 @@ describe("/api/users", () => {
     });
   });
 
-  describe("GET /api/users/me", () => {
+  xdescribe("GET /api/users/me", () => {
     it("sends back users data if valid token is supplied in header", async () => {
       const { fakeUser, token } = await createFakeUserWithToken();
 
@@ -223,7 +223,7 @@ describe("/api/users", () => {
     });
   });
 
-  describe("GET /api/users/:username/routines", () => {
+  xdescribe("GET /api/users/:username/routines", () => {
     it("Gets a list of public routines for a particular user.", async () => {
       // Create a fake user with a bunch of routines associated
       const { fakeUser, token } = await createFakeUserWithRoutinesAndActivities(
