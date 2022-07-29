@@ -4,6 +4,7 @@ const router = express.Router();
 const { getUserByUsername, createUser, getUserById } = require("../db");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
+const {requireUser} = require("./utils")
 
 // POST /api/users/register
 router.post("/register", async (req, res, next) => {
@@ -93,46 +94,27 @@ router.post("/login", async (req, res, next) => {
 });
 
 // GET /api/users/me
-router.get('/me', async (req,res,next)=> {
-  const prefix = 'Bearer '
-  const auth = req.header('Authorization')
-
-  if (!auth) {
-    next()
-  } else if (auth.startsWith(prefix)) {
-    const token = auth.slice(prefix.length)
-    try {
-    const {id} = jwt.verify(token, JWT_SECRET)
-
-    if (id) {
-      req.user = await getUserById(id)
-      const user = req.user
-      res.send(user)
-    }
-  } catch ({name, message}) {
-    next({name, message})
-  }
-  } else {
-    next({
-      name: 'AuthorizationHeaderError',
-      message: `Authorization must start with ${prefix}`
-    })
-  }
+router.get('/me', requireUser, async (req,res,next)=> {
+ try {
+res.send(req.user)
+ } catch (error) {
+  next(error)
+ }
 })
 
-GET /api/users/:username/routines
+// GET /api/users/:username/routines
 
-router.get('/:username/routines', async (req,res,next)=> {
-try {
-    const user = await getPublicRoutinesByUser (req.params.username)
-    if (user && user) {
+// router.get('/:username/routines', async (req,res,next)=> {
+// try {
+//     const user = await getPublicRoutinesByUser (req.params.username)
+//     if (user && user) {
 
-    }
-}
+//     }
+// }
 
-} catch (err) {
+// } catch (err) {
 
-})
+// })
 
 
 module.exports = router;
