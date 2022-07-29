@@ -14,10 +14,10 @@ router.post("/register", async (req, res, next) => {
       message: "Please supply both username and password",
     });
   }
-  if (password.length > 8) {
+  if (password.length < 8) {
     next({
       name: "PassswordLengthError",
-      message: "Password is not long enough",
+      message: "Password Too Short!",
     });
   }
   try {
@@ -25,35 +25,43 @@ router.post("/register", async (req, res, next) => {
     if (_user) {
       next({
         name: "UserExistsError",
-        message: "A user by that username already exists",
+        message: `User ${_user.username} is already taken.`,
       });
+    } else {
+        const user = await createUser({
+            username,
+            password,
+          });
+          console.log(user, '!!!!!!')
+          if (user) {
+            const token = jwt.sign(
+                {
+                  id: user.id,
+                  username,
+                },
+                JWT_SECRET,
+                {
+                  expiresIn: "2w",
+                }
+              );
+              res.send({ message: "Thank you for signing up!", token, user});
+          } else {
+            next({
+                name: "UserCreationError",
+                message: "Error creating user",
+            })
+          }
+          
     }
 
-    const user = await createUser({
-      username,
-      password,
-    });
-    console.log(user, '!!!!!!')
-    const token = jwt.sign(
-      {
-        id: user.id,
-        username,
-      },
-      JWT_SECRET,
-      {
-        expiresIn: "2w",
-      }
-    );
-    res.send({ message: "Thank you for signing up!", token, user});
+    
   } catch (error) {
-    console.log(error)
     next(error);
   }
 });
 
 // POST /api/users/login
 router.post("/login", async (req, res, next) => {
-  console.log(req.body, "@@@@@@@");
   const { password, username } = req.body;
   if (!username || !password) {
     next({
@@ -63,7 +71,6 @@ router.post("/login", async (req, res, next) => {
   }
   try {
     const user = await getUserByUsername(username);
-    console.log(user, "%%%%%%%");
     if (user) {
       const token = jwt.sign(
         {
@@ -99,7 +106,8 @@ router.get('/me', async (req,res,next)=> {
 
     if (id) {
       req.user = await getUserById(id)
-      
+      const user = req.user
+      res.send(user)
     }
   } catch ({name, message}) {
     next({name, message})
@@ -112,6 +120,19 @@ router.get('/me', async (req,res,next)=> {
   }
 })
 
-// GET /api/users/:username/routines
+GET /api/users/:username/routines
+
+router.get('/:username/routines', async (req,res,next)=> {
+try {
+    const user = await getPublicRoutinesByUser (req.params.username)
+    if (user && user) {
+
+    }
+}
+
+} catch (err) {
+
+})
+
 
 module.exports = router;
