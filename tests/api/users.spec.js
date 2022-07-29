@@ -36,7 +36,7 @@ const {
 } = require("../../errors");
 
 describe("/api/users", () => {
-  xdescribe("POST /api/users/register", () => {
+  describe("POST /api/users/register", () => {
     it("Creates a new user.", async () => {
       // Create some fake user data
       const fakeUserData = {
@@ -133,7 +133,7 @@ describe("/api/users", () => {
     });
   });
 
-  describe("POST /api/users/login", () => {
+  xdescribe("POST /api/users/login", () => {
     it("Logs in the user. Requires username and password, and verifies that hashed login password matches the saved hashed password.", async () => {
       // Create some fake user data
       const userData = {
@@ -149,11 +149,7 @@ describe("/api/users", () => {
 
       expectNotToBeError(response.body);
 
-      expect(response.body).toEqual(
-        objectContaining({
-          message: "you're logged in!",
-        })
-      );
+      expect(response.body.message).toEqual("You are logged in");
     });
 
     it("Logs in the user and returns the user back to us", async () => {
@@ -201,7 +197,7 @@ describe("/api/users", () => {
     });
   });
 
-  xdescribe("GET /api/users/me", () => {
+  describe("GET /api/users/me", () => {
     it("sends back users data if valid token is supplied in header", async () => {
       const { fakeUser, token } = await createFakeUserWithToken();
 
