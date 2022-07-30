@@ -33,7 +33,6 @@ router.post("/register", async (req, res, next) => {
             username,
             password,
           });
-          console.log(user, '!!!!!!')
           if (user) {
             const token = jwt.sign(
                 {
@@ -107,14 +106,13 @@ res.send(req.user)
 // router.get('/:username/routines', async (req,res,next)=> {
 // try {
 //     const user = await getPublicRoutinesByUser (req.params.username)
+//     console.log(user, "!!!!!!!!!!!!");
 //     if (user && user) {
 
 //     }
-// }
+//  } catch (err) {
 
-// } catch (err) {
-
-// })
+// }} )
 
 
 module.exports = router;
