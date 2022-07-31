@@ -35,7 +35,7 @@ const {
   UnauthorizedError,
 } = require("../../errors");
 
-xdescribe("/api/users", () => {
+describe("/api/users", () => {
   xdescribe("POST /api/users/register", () => {
     it("Creates a new user.", async () => {
       // Create some fake user data
@@ -219,7 +219,7 @@ xdescribe("/api/users", () => {
     });
   });
 
-  describe("GET /api/users/:username/routines", () => {
+  xdescribe("GET /api/users/:username/routines", () => {
     it("Gets a list of public routines for a particular user.", async () => {
       // Create a fake user with a bunch of routines associated
       const { fakeUser, token } = await createFakeUserWithRoutinesAndActivities(

@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
 const express = require("express");
 const router = express.Router();
-const { getUserByUsername, createUser, getUserById } = require("../db");
+const { getUserByUsername, createUser, getUserById, getPublicRoutinesByUser, getAllRoutinesByUser } = require("../db");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
 const {requireUser} = require("./utils")
@@ -103,16 +103,26 @@ res.send(req.user)
 
 // GET /api/users/:username/routines
 
-// router.get('/:username/routines', async (req,res,next)=> {
-// try {
-//     const user = await getPublicRoutinesByUser (req.params.username)
-//     console.log(user, "!!!!!!!!!!!!");
-//     if (user && user) {
+router.get('/:username/routines',requireUser, async (req,res,next)=> {
+  const {username } = req.params
+  console.log(username, 'username')
+  const user = req.user
+try {
+  const publicuser = await getPublicRoutinesByUser(username)
 
-//     }
-//  } catch (err) {
-
-// }} )
+  if (username === user.username) {
+    const user = await getAllRoutinesByUser(username)
+    console.log(user, "!!!!!!!!!!!!");
+    res.send(user)
+  } else {
+    next({
+      name: 'idl',
+      message: 'idk'
+    })
+  }
+ } catch ({name, message}) {
+next({name,message})
+}} )
 
 
 module.exports = router;

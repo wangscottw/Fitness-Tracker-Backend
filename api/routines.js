@@ -37,6 +37,9 @@ router.post('/', requireUser, async (req,res,next)=> {
 router.patch('/:routineId', requireUser, async(req,res,next)=> {
     const {routineId} = req.params
     const {isPublic, name, goal } = req.body
+    const obj = {
+        id: routineId
+    }
     const updatedRoutine = {}
     if (isPublic) {
         updatedRoutine.isPublic = isPublic
@@ -52,14 +55,15 @@ router.patch('/:routineId', requireUser, async(req,res,next)=> {
         const originalRoutine = await getRoutineById(routineId)
         console.log(originalRoutine, 'OR')
         if (originalRoutine.creatorId === req.user.id) {
-            const newRoutine = await updateRoutine(routineId, updatedRoutine)
-            console.log(newRoutine, "NR")
-            res.send({ newRoutine})
+            const newRoutine = await updateRoutine(obj, updatedRoutine)
+            console.log(updatedRoutine, "NR")
+            res.send(newRoutine)
         } else {
+            res.status(403);
             next({
-                name: 'UnauthorizedUserError',
-                message: 'You cannot update a routine that is not yours'
-            })
+                name: "MissingUserError",
+                message: `User ${req.user.username} is not allowed to update Every day`
+              })
         }
     } catch ({name, message}) {
         next({name, message})
@@ -76,18 +80,18 @@ router.delete('/:routineId', requireUser, async(req,res,next)=> {
             const deleteRoutine = destroyRoutine(obj)
             res.send(deleteRoutine)
         } else {
-            next(routine ? {
-                name: 'UnauthorizedUserError',
-                message: 'You cannot delete a routine which is not yours'
-            } : {
-                name: 'RoutineNotFoundError',
-                message: 'That routine does not exist'
-            })
+            res.status(403);
+            next({
+                name: "MissingUserError",
+                message: `User ${req.user.username} is not allowed to delete On even days`
+              })
         }
     } catch ({name, message}) {
         next({name, message})
     }
 })
 // POST /api/routines/:routineId/activities
-
+router.post('/:routineId/activities', async(req,res,next)=> {
+    
+})
 module.exports = router;

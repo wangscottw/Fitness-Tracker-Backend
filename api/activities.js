@@ -1,6 +1,6 @@
-const e = require('express');
+
 const express = require('express');
-const { getAllActivities, createActivity, updateActivity, getActivityById, getPublicRoutinesByActivity} = require('../db');
+const { getAllActivities, createActivity, updateActivity, getActivityById, getPublicRoutinesByActivity, getActivityByName} = require('../db');
 const router = express.Router();
 const {requireUser} = require('./utils');
 
@@ -44,23 +44,27 @@ router.get('/', async(req,res,next) => {
 
 router.post('/', requireUser, async(req,res,next) => {
 const {name,description} = req.body
-const postData = {
-    name, description
-}
- if (name) {
-     next({
+const activities = await getAllActivities()
+if (activities.name === name) {
+    next({
         name: "Name already exists",
         message: `An activity with name ${name} already exists`,
     })
 }
+
+const postData = {
+    name, description
+}
+
+ 
 try {
     const activity = await createActivity(postData)
     if (activity){
-        res.send({activity})
+        res.send(activity)
     } else {
         next({
             name: "Incorrect credientials",
-            message: "Trouble fetching activity",
+            message: `An activity with name ${name} already exists`
         })
     }
 } catch({name, message}) {
@@ -74,32 +78,41 @@ try {
 
 router.patch("/:activityId", requireUser, async(req,res,next) => {
     const {activityId} = req.params
-    const {name, description} = req.params
-    const updateFields = {}
+    const obj = {id:activityId}
+    const {name, description} = req.body
+    const fields = {}
     if (name) {
-      updateFields.name = name
+      fields.name = name
     } 
     if (description) {
-        updateFields.description = description
+        fields.description = description
     }
+    
+    
+ 
     try {
-        const originalActivity = getActivityById (activityId)
-        // console.log(originalActivity, "###############")
-        if (originalActivity.name === name) {
-            next({
-                name: "Name error",
-                message: `An activity with name ${originalActivity.name} already exists`,
-            })
-        }
-        if (originalActivity.id === activityId) {
-            const updateActivity = await updateActivity(activityId, updateFields)
-            res.send ({activity:updateActivity})
-        } else {
-            next({
-                name: "Unauthorized user error",
-                message: `Activity ${activityId} not found`,
-            })
-        }
+        const activitiesName = await getAllActivities()
+    console.log(activitiesName.name, 'kjxoqn')
+
+        
+
+        console.log(activitiesName, "kjnsojn")
+       const activity = await updateActivity(obj, fields)
+       console.log(fields, 'fields')
+       if(activitiesName.id !== activityId) {
+           next({
+               name:'doesnotexisterror',
+               message: `Activity ${activityId} not found`
+           })
+       } else if (activitiesName.name) {
+        next({
+            name: 'already exists',
+            message: `An activity with name ${name} already exists`
+        })
+    }
+       else {
+       res.send(activity)
+       }
     } catch ({name, message}) {
         next({name, message})
     }

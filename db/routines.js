@@ -82,7 +82,7 @@ async function getAllRoutinesByUser({ username }) {
   
    return attachActivitiesToRoutines(routines)
 } catch (error) {
-  console.error('Trouble getting All routines ' + error)
+  console.error('Trouble getting All routines ', error)
 }
 }
 
