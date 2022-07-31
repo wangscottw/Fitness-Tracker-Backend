@@ -45,6 +45,7 @@ router.get('/', async(req,res,next) => {
 router.post('/', requireUser, async(req,res,next) => {
 const {name,description} = req.body
 const activities = await getAllActivities()
+
 if (activities.name === name) {
     next({
         name: "Name already exists",
@@ -92,27 +93,31 @@ router.patch("/:activityId", requireUser, async(req,res,next) => {
  
     try {
         const activitiesName = await getAllActivities()
-    console.log(activitiesName.name, 'kjxoqn')
-
+    
+    for (let i = 0; i < activitiesName.length; i++) {
+        let charr = activitiesName[i]
         
-
-        console.log(activitiesName, "kjnsojn")
-       const activity = await updateActivity(obj, fields)
-       console.log(fields, 'fields')
-       if(activitiesName.id !== activityId) {
-           next({
-               name:'doesnotexisterror',
-               message: `Activity ${activityId} not found`
-           })
-       } else if (activitiesName.name) {
-        next({
-            name: 'already exists',
-            message: `An activity with name ${name} already exists`
-        })
+        if(charr.name === name) {
+            next({
+                name: 'already exists',
+                message: `An activity with name ${name} already exists`
+            })
+        }
+        else if (charr.id !== activityId) {
+            next({
+                name:'doesnotexisterror',
+                message: `Activity ${activityId} not found`
+            })
+        } else {
+            const activity = updateActivity(obj, fields)
+            res.send(activity)
+        }
     }
-       else {
-       res.send(activity)
-       }
+    
+
+     
+       
+    
     } catch ({name, message}) {
         next({name, message})
     }

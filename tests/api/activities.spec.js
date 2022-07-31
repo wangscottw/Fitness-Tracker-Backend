@@ -82,7 +82,7 @@ describe("/api/activities", () => {
     });
   });
 
-  describe("PATCH /api/activities/:activityId (*)", () => {
+  xdescribe("PATCH /api/activities/:activityId (*)", () => {
     it("Anyone can update an activity (yes, this could lead to long term problems a la wikipedia)", async () => {
       const { token } = await createFakeUserWithToken("Allison");
       const fakeActivity = await createFakeActivity(

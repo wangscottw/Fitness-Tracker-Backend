@@ -36,7 +36,7 @@ const {
 } = require("../../errors");
 
 describe("/api/users", () => {
-  xdescribe("POST /api/users/register", () => {
+ xdescribe("POST /api/users/register", () => {
     it("Creates a new user.", async () => {
       // Create some fake user data
       const fakeUserData = {
@@ -240,7 +240,7 @@ describe("/api/users", () => {
       expect(response.body).toEqual([...routinesFromDB]);
     });
 
-    it("gets a list of all routines for the logged in user", async () => {
+    xit("gets a list of all routines for the logged in user", async () => {
       const { fakeUser, token } = await createFakeUserWithRoutinesAndActivities(
         "Angela"
       );

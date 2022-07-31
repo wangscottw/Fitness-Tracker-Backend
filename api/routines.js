@@ -91,7 +91,7 @@ router.delete('/:routineId', requireUser, async(req,res,next)=> {
     }
 })
 // POST /api/routines/:routineId/activities
-router.post('/:routineId/activities', async(req,res,next)=> {
+// router.post('/:routineId/activities', async(req,res,next)=> {
     
-})
+// })
 module.exports = router;

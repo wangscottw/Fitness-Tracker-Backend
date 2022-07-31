@@ -103,21 +103,29 @@ res.send(req.user)
 
 // GET /api/users/:username/routines
 
-router.get('/:username/routines',requireUser, async (req,res,next)=> {
+router.get('/:username/routines', async (req,res,next)=> {
   const {username } = req.params
+  const obj = {
+    username: username
+  }
+  
   console.log(username, 'username')
   const user = req.user
+  console.log(user.username, 'username1')
 try {
-  const publicuser = await getPublicRoutinesByUser(username)
-
+  const publicuser = await getPublicRoutinesByUser(obj)
+  if (publicuser.length) {
+res.send(publicuser)
+  }
   if (username === user.username) {
-    const user = await getAllRoutinesByUser(username)
+    const user = await getAllRoutinesByUser(obj)
+   
     console.log(user, "!!!!!!!!!!!!");
     res.send(user)
   } else {
     next({
-      name: 'idl',
-      message: 'idk'
+      name: 'NotLoggedInError',
+      message: 'User must be logged in'
     })
   }
  } catch ({name, message}) {
