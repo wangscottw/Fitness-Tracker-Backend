@@ -8,7 +8,7 @@ const {requireUser} = require('./utils');
 router.get('/:activityId/routines', async(req,res,next) => {
     const {activityId} = req.params
     const obj = {id:activityId}
-    console.log(activityId, "^^^^^^^^^^^^^^")
+    // console.log(activityId, "^^^^^^^^^^^^^^")
     try{
         const activity = await getPublicRoutinesByActivity(obj)
         console.log(activity, "****************")
@@ -84,7 +84,7 @@ router.patch("/:activityId", requireUser, async(req,res,next) => {
     }
     try {
         const originalActivity = getActivityById (activityId)
-        console.log(originalActivity, "###############")
+        // console.log(originalActivity, "###############")
         if (originalActivity.name === name) {
             next({
                 name: "Name error",
