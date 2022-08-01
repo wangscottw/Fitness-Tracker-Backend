@@ -4,137 +4,157 @@ const { attachActivitiesToRoutines } = require("./activities");
 
 async function createRoutine({ creatorId, isPublic, name, goal }) {
   try {
-    const {rows: [routine]} = await client.query (`
+    const {
+      rows: [routine],
+    } = await client.query(
+      `
     INSERT INTO routines ("creatorId", "isPublic", name, goal)
     VALUES ($1, $2, $3, $4)
     RETURNING *;
-    `, [creatorId,isPublic,name,goal])
-    return routine
+    `,
+      [creatorId, isPublic, name, goal]
+    );
+    return routine;
   } catch (error) {
-    console.log('Trouble creating activity', error)
+    console.error("Trouble creating activity", error);
   }
 }
 
 async function getRoutineById(routineId) {
   try {
-    const {rows: [routine]} = await client.query(`
+    const {
+      rows: [routine],
+    } = await client.query(`
     SELECT * 
     FROM routines
     WHERE id=${routineId}
-    `)
+    `);
     if (!routine) {
-      return null
+      return null;
     }
-    return routine
+    return routine;
   } catch (error) {
-    console.error('Trouble getting routine by id', error)
+    console.error("Trouble getting routine by id", error);
   }
 }
 
 async function getRoutinesWithoutActivities() {
-try {
-  const {rows: [routines]} = await client.query(`
+  try {
+    const {
+      rows: [routines],
+    } = await client.query(`
   SELECT name
   FROM routines
-  `)
-  console.log(routines, "!!!!!!")
-  
-  return routines
-} catch (error) {
-  console.error
-}
+  `);
+
+    return routines;
+  } catch (error) {
+    console.error;
+  }
 }
 
 async function getAllRoutines() {
   try {
-    const {rows: routines} = await client.query(`
+    const { rows: routines } = await client.query(`
     SELECT routines.*, users.username AS "creatorName"
     FROM routines
     JOIN users ON routines."creatorId" = users.id;
-    `)
-    return attachActivitiesToRoutines(routines)
+    `);
+    return attachActivitiesToRoutines(routines);
   } catch (error) {
-    console.error('Trouble getting all routines', error)
+    console.error("Trouble getting all routines", error);
   }
 }
 
 async function getAllPublicRoutines() {
   try {
-    const {rows: routines} = await client.query(`
+    const { rows: routines } = await client.query(`
     SELECT routines.*, users.username AS "creatorName"
     FROM routines
     JOIN users ON routines."creatorId" = users.id
     WHERE "isPublic" = true;
-  `) 
-  return attachActivitiesToRoutines(routines);} 
-  catch (error) {
-    console.error('Trouble getting all public routines', error)
-    }
+  `);
+    return attachActivitiesToRoutines(routines);
+  } catch (error) {
+    console.error("Trouble getting all public routines", error);
   }
+}
 async function getAllRoutinesByUser({ username }) {
   try {
-    const {rows: routines} = await client.query(`
+    const { rows: routines } = await client.query(
+      `
     SELECT routines.*, users.username AS "creatorName"
     FROM routines
     JOIN users ON routines."creatorId" = users.id
     WHERE username = $1;
-  `, [username])
-  
-   return attachActivitiesToRoutines(routines)
-} catch (error) {
-  console.error('Trouble getting All routines ', error)
-}
+  `,
+      [username]
+    );
+
+    return attachActivitiesToRoutines(routines);
+  } catch (error) {
+    console.error("Trouble getting All routines ", error);
+  }
 }
 
 async function getPublicRoutinesByUser({ username }) {
   try {
-    const {rows: routines} = await client.query(`
+    const { rows: routines } = await client.query(
+      `
     SELECT routines.*, users.username AS "creatorName"
     FROM routines
     JOIN users ON routines."creatorId" = users.id
     WHERE "isPublic" = true AND username = $1;
-  `, [username]) 
-  return attachActivitiesToRoutines(routines);} 
-  catch (error) {
-    console.error('Trouble getting all public routines', error)
-    }
+  `,
+      [username]
+    );
+    return attachActivitiesToRoutines(routines);
+  } catch (error) {
+    console.error("Trouble getting all public routines", error);
   }
+}
 async function getPublicRoutinesByActivity({ id }) {
   try {
-    const {rows: routines} = await client.query(`
+    const { rows: routines } = await client.query(
+      `
     SELECT routines.*, users.username AS "creatorName"
     FROM routines
     JOIN routine_activities ON routine_activities."routineId"= routines.id
     JOIN users ON routines."creatorId" = users.id
     WHERE "isPublic" = true AND "activityId"=$1;
-  `, [id]) 
-  return attachActivitiesToRoutines(routines);} 
-  catch (error) {
-    console.error('Trouble getting all public routines', error)
-    }
+  `,
+      [id]
+    );
+    return attachActivitiesToRoutines(routines);
+  } catch (error) {
+    console.error("Trouble getting all public routines", error);
+  }
 }
 
-async function updateRoutine( id, fields={} ) {
-  const setString = Object.keys(fields).map((key, index) => `"${key}"=$${index + 1}`
-  ).join(', ');
+async function updateRoutine({ id, ...fields }) {
+  const setString = Object.keys(fields)
+    .map((key, index) => `"${key}"=$${index + 1}`)
+    .join(", ");
 
-  if(setString.length === 0) {
-  return;
-}
- try {
-  const {
-    rows: [routine]
-  } = await client.query(`
+  if (setString.length === 0) {
+    return;
+  }
+  try {
+    const {
+      rows: [routine],
+    } = await client.query(
+      `
   UPDATE routines
   SET ${setString}
   WHERE id=${id}
   RETURNING *;
   `,
-  Object.values(fields));
-  return routine;
-} catch (error) {
-  console.error ('trouble getting update routine', error);
-}
+      Object.values(fields)
+    );
+    return routine;
+  } catch (error) {
+    console.error("trouble getting update routine", error);
+  }
 }
 
 async function destroyRoutine(id) {
@@ -142,22 +162,21 @@ async function destroyRoutine(id) {
     await client.query(`
     DELETE FROM routine_activities
     WHERE "routineId" = ${id};
-    `)
-    
-    const {rows: [routine]} = await client.query(`
+    `);
+
+    const {
+      rows: [routine],
+    } = await client.query(`
     DELETE FROM routines
     WHERE id=${id}
     RETURNING *;
-    `)
+    `);
 
     return routine;
-  } 
-   catch (error) {
-  console.error ('trouble removing routine', error);
-
-   }
-
+  } catch (error) {
+    console.error("trouble removing routine", error);
   }
+}
 
 module.exports = {
   getRoutineById,
