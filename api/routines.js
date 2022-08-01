@@ -1,5 +1,6 @@
 const express = require('express');
-const { getAllRoutines, createRoutine, getRoutineById, updateRoutine, destroyRoutine } = require('../db/routines');
+const { attachActivitiesToRoutines, getRoutineActivitiesByRoutine } = require('../db');
+const { getAllRoutines, createRoutine, getRoutineById, updateRoutine, destroyRoutine} = require('../db/routines');
 const { requireUser } = require('./utils');
 const router = express.Router();
 
@@ -40,23 +41,28 @@ router.patch('/:routineId', requireUser, async(req,res,next)=> {
     const obj = {
         id: routineId
     }
-    const updatedRoutine = {}
+    const fields = {
+        
+    }
     if (isPublic) {
-        updatedRoutine.isPublic = isPublic
+        fields.isPublic = isPublic
+    }
+    if (!isPublic) {
+        fields.isPublic = isPublic
     }
     if(name) {
-        updatedRoutine.name = name
+        fields.name = name
     }
     if(goal) {
-        updatedRoutine.goal = goal
+        fields.goal = goal
     }
 
     try {
         const originalRoutine = await getRoutineById(routineId)
         console.log(originalRoutine, 'OR')
         if (originalRoutine.creatorId === req.user.id) {
-            const newRoutine = await updateRoutine(obj, updatedRoutine)
-            console.log(updatedRoutine, "NR")
+            const newRoutine = await updateRoutine(routineId, fields)
+            console.log(fields, "NR")
             res.send(newRoutine)
         } else {
             res.status(403);
@@ -77,8 +83,8 @@ router.delete('/:routineId', requireUser, async(req,res,next)=> {
         const routine = await getRoutineById(routineId)
         console.log(routine, 'routiness')
         if (routine && routine.creatorId === req.user.id) {
-            const deleteRoutine = destroyRoutine(obj)
-            res.send(deleteRoutine)
+            destroyRoutine(routineId)
+            res.send(routine)
         } else {
             res.status(403);
             next({
@@ -91,7 +97,17 @@ router.delete('/:routineId', requireUser, async(req,res,next)=> {
     }
 })
 // POST /api/routines/:routineId/activities
-// router.post('/:routineId/activities', async(req,res,next)=> {
-    
-// })
+router.post('/:routineId/activities', async(req,res,next)=> {
+    const {routineId} = req.params
+    const obj = {
+        id: routineId
+    }
+    try {
+        const routine = await getRoutineActivitiesByRoutine(obj)
+        console.log(routine, "!!!!!!!!!!!!!!!!!!!!!!!!!!@@@")
+        
+    } catch ({name, message}) {
+        next({name, message})
+    }
+})
 module.exports = router;

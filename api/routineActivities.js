@@ -1,5 +1,5 @@
 const express = require('express');
-const { updateRoutineActivity, getRoutineActivityById, destroyRoutineActivity} = require('../db');
+const { updateRoutineActivity, getRoutineActivityById, destroyRoutineActivity, canEditRoutineActivity} = require('../db');
 const { requireUser } = require('./utils');
 const router = express.Router();
 
@@ -10,10 +10,10 @@ router.patch('/:routineActivityId', requireUser, async(req,res,next)=> {
     const {count, duration} = req.body
     const user = req.user
     const updatedField = {}
-    if (count.length) {
+    if (count) {
         updatedField.count = count
     }
-    if(duration.length) {
+    if(duration) {
         updatedField.duration = duration
     }
     try {
@@ -37,21 +37,20 @@ router.patch('/:routineActivityId', requireUser, async(req,res,next)=> {
 // DELETE /api/routine_activities/:routineActivityId
 router.delete('/:routineActivityId', requireUser, async(req,res,next)=> {
     const {routineActivityId} = req.params
-    const user = req.user
+    const user = req.authorization
+    console.log(user, "!@#!@#!@#")
     try {
-        const routineActivity = await getRoutineActivityById(routineActivityId)
-        console.log(routineActivity.id, "ra")
-        console.log(req.user.id)
-        if(routineActivity.id !== req.user.id) {
-            res.status(403);
-      next({
-        name: "MissingUserError",
-        message: `User ${user.username} is not allowed to delete In the afternoon`
-      });
+        const activity = await getRoutineActivityById(routineActivityId)
+        console.log(activity, 'routiness')
+        if (canEditRoutineActivity() ) {
+            destroyRoutineActivity(routineActivityId)
+            res.send(activity)
         } else {
-            const deleteActivity = await destroyRoutineActivity(routineActivityId)
-            console.log(deleteActivity, "da")
-            res.send(deleteActivity)
+            res.status(403);
+            next({
+                name: "MissingUserError",
+                message: `User ${req.user.username} is not allowed to delete In the afternoon`
+              })
         }
     } catch ({name, message}) {
         next({name, message})

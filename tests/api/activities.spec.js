@@ -24,8 +24,8 @@ const { arrayContaining } = expect;
 
 const { getPublicRoutinesByActivity } = require("../../db");
 
-describe("/api/activities", () => {
-  xdescribe("GET /api/activities", () => {
+xdescribe("/api/activities", () => {
+  describe("GET /api/activities", () => {
     it("Just returns a list of all activities in the database", async () => {
       // Create a fake activity to watch for
       const fakeActivity = await createFakeActivity(

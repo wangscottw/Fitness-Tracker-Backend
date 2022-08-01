@@ -23,12 +23,12 @@ try {
 
 async function getRoutineActivityById(id) {
   try {
-    const {rows: [routinActivity]} = await client.query(`
+    const {rows: [routineActivity]} = await client.query(`
     SELECT *
     FROM routine_activities
     WHERE id=${id}
     `)
-    return routinActivity
+    return routineActivity
   } catch (error) {
     console.error
   }
@@ -48,7 +48,7 @@ async function getRoutineActivitiesByRoutine({ id }) {
   }
 }
 
-async function updateRoutineActivity({ id, ...fields }) {
+async function updateRoutineActivity( id, fields= {} ) {
   const setString = Object.keys(fields).map((key, index)=> `"${key}" = $${index + 1}`).join(', ')
 
   if (setString.length === 0) {
